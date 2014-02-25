@@ -7,12 +7,9 @@
 # Author: Mario Staykov
 
 function populateList {
-	# a fix for not getting the sample movie files is used. Add new formats here.
-	find . -iname "*.mkv" | grep -vi sample > listtmp
-	find . -iname "*.avi" | grep -vi sample >> listtmp
-	find . -iname "*.ts"  | grep -vi sample >> listtmp
-	find . -iname "*.mp4" | grep -vi sample >> listtmp
-	cat listtmp | sort > listpure; rm listtmp
+	# a sample movie files is are excluded. Add new formats here.
+	formats='mkv\|mpe?g\|avi\|ts\|mp4'
+	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > listpure
 }
 function ensureSaved {
 	if [ ! -f saved ]
@@ -25,10 +22,8 @@ function playNext {
 	epnumber=$(cat saved)
 	if [ "$(cat saved)" -le "$(cat listpure | wc -l)" ] # if there is at least one more episode
 	then
-	  #bash /home/discharge/scripts/1seriesMover& #it decides if to move
-	  #wmctrl -r "/bin/bash" -e 0,840,1243,500,250 # move the terminal
 	  #mplayer "$(cat listpure | head -$epnumber | tail -1)" -alang jpn,Japanese,eng,English -slang eng,English
-	  mplayer "$(cat listpure | head -$epnumber | tail -1)" 
+	  $player "$(cat listpure | head -$epnumber | tail -1)" 
 	fi
 }
 function incrementSaved {
@@ -96,12 +91,7 @@ function presentSeries {
 		fi
 		# find only the related files for counting. Add new format here. Ignores sample files as well. 
 		# Note: Don't put space after the line continuation indicating backslash.
-		total=$( find "$initialDir/${dir[$count]}" \
-		-iname "*.mkv" -and ! -iname "*sample*" -or \
-		-iname "*.avi" -and ! -iname "*sample*" -or \
-		-iname "*.ts" -and ! -iname "*sample*" -or \
-		-iname "*.mp4" -and ! -iname "*sample*" \
-		| wc -l )
+		total=$( find "$initialDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
 		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
@@ -110,20 +100,27 @@ function presentSeries {
 # gets the directory path from the file, asks user for first time setup if there it's not in the script's folder
 function firstRun {	
 	# BASH_SOURCE[0] gets the script directory even if it was invoked with 'source <name>'
-	if [ ! -f $(dirname "${BASH_SOURCE[0]}")/initialDir ] 
+	if [ ! -f $(dirname "${BASH_SOURCE[0]}")/config.seriesDir ] 
 	then
-		echo '-=- First time use detected. Please specify the pathname of the series directory. Example: ~/videos/series.'
+		echo '-?- First time use detected. Please specify the pathname of the series directory. Example: ~/videos/series.'
 		read initialDir
 		# outputs to the a new file in the script's folder
-		echo $initialDir > $(dirname "${BASH_SOURCE[0]}")/initialDir
+		echo $initialDir > $(dirname "${BASH_SOURCE[0]}")/config.seriesDir
 		echo '-=- Series directory initialized.'
+	fi
+	if [ ! -f $(dirname "${BASH_SOURCE[0]}")/config.player ]
+	then
+		echo '-?- Please specify the video player which you want to use. Example: mplayer'
+		read player
+		echo $player > $(dirname "${BASH_SOURCE[0]}")/config.player
+		echo '-=- $player selected.'
 	fi
 }
 
 # if current dir is ~, ask user to choose series to watch (changes the current dir accordingly after choice)
 function seekDirFromHome {
 	# eval is used so ~ is expanded
-	eval initialDir=$(cat $(dirname "${BASH_SOURCE[0]}")/initialDir)
+	eval initialDir=$(cat $(dirname "${BASH_SOURCE[0]}")/config.seriesDir)
 	if [ "$(pwd)" == "$HOME" ]
 	then
 		echo "Series available:"
@@ -145,7 +142,7 @@ function selectModeAndPlay {
 	case $inputMode in
 		--help | -h)
 			echo '-=- Usage: Run without arguments, either from home or a specific series directory. --check shows the series guide. Refer to README for details.'
-			kill -SIGINT $$;
+			kill -SIGINT $$; # as script is called with source, exit would destroy the running shell
 			;;
 			
 		--check)
@@ -155,10 +152,18 @@ function selectModeAndPlay {
 			;;
 			
 		--newdir)
-			echo '-=- Please specify the pathname of the new series directory. Example: ~/videos/series'
+			echo '-?- Please specify the pathname of the new series directory. Example: ~/videos/series'
 			read newDir;
-			echo $newDir > $(dirname "${BASH_SOURCE[0]}")/initialDir;
+			echo $newDir > $(dirname "${BASH_SOURCE[0]}")/config.seriesDir;
 			echo '-=- Series directory updated to $newDir...';
+			kill -SIGINT $$;
+			;;
+			
+		--newplayer)
+			echo '-?- Please specify a new video player to be used. Example: mplayer'
+			read newPlayer
+			echo $newPlayer > $(dirname "${BASH_SOURCE[0]}")/config.player;
+			echo '-=- Player updated to $newDir...';
 			kill -SIGINT $$;
 			;;
 			

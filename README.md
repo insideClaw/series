@@ -40,7 +40,10 @@ Only show guide for the chosen series, without playing.
 		
 --newdir  
 Prompts for entering a new main series directory.
-		
+
+--newplayer
+Prompts for entering a new player to be used.
+
 --install  
 Automates the insertion of the alias in .bashrc.
 
