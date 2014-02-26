@@ -121,6 +121,7 @@ function firstRun {
 function seekDirFromHome {
 	# eval is used so ~ is expanded
 	eval initialDir=$(cat $(dirname "${BASH_SOURCE[0]}")/config.seriesDir)
+	player=$(cat $(dirname "${BASH_SOURCE[0]}")/config.player)
 	if [ "$(pwd)" == "$HOME" ]
 	then
 		echo "Series available:"
