@@ -6,9 +6,9 @@
 #
 # Author: Mario Staykov
 
+# a sample movie files is are excluded. Add new formats here.
+formats='mkv\|mpe?g\|avi\|ts\|mp4'
 function populateList {
-	# a sample movie files is are excluded. Add new formats here.
-	formats='mkv\|mpe?g\|avi\|ts\|mp4'
 	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > listpure
 }
 function ensureSaved {
@@ -89,9 +89,8 @@ function presentSeries {
 		then
 			saved="0"
 		fi
-		# find only the related files for counting. Add new format here. Ignores sample files as well. 
-		# Note: Don't put space after the line continuation indicating backslash.
-		total=$( find "$initialDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
+		# uses the variable formats, announced previously
+		total=$(find "$initialDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
 		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
