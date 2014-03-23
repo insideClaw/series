@@ -108,7 +108,11 @@ function populateList {
 }
 # having the details of the episode settled, play the desired file
 function playNext {
-	ensureSaved;
+	# ensure the saved file exists, if not, create one
+	if [ ! -f saved ]
+	then
+	  echo 1 > saved
+	fi
 	epnumber=$(cat saved)
 	if [ "$(cat saved)" -le "$(cat listpure | wc -l)" ] # if there is at least one more episode
 	then
