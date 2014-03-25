@@ -73,8 +73,16 @@ function chooseDirFromHome {
 		presentSeries;
 		echo "Choose what to watch... "
 		read choice;
+		# a bit of input sanitizing, $seriesAmount was initialized in presentSeries()
+		# the while loop checks if the choice is NOT a valid positive integer within permitted range
+		while [[ ! $choice =~ ^[0-9]+$ ]] || [ $choice -lt 1 ] || [ $choice -gt $seriesAmount ] 
+		do
+			echo "-!- Choice not an valid integer (1-$seriesAmount). Pick again:"
+			read choice
+		done
+		
 		choice=$(( $choice - humanBit)) # the choice entered was with human numericals in mind, revert it for computer use
-		echo "${dir[$choice]} decided!"
+		echo "-=- ${dir[$choice]} decided!"
 		cd "$initialDir/${dir[$choice]}"
 	# if the current directory is a descendant of the series directory, continue script, otherwise don't proceed as if it's a series directory.
 	elif [ "$(pwd | grep $initialDir -o)" == "" ] || [ "$(pwd)" == "$initialDir" ] 
