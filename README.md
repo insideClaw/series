@@ -52,7 +52,6 @@ Prompts for entering a new player to be used.
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * Can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
-* When choosing an episode, not entering a number and pressing enter plays the last series.  
 
 **Contact**:  
 For any questions, comments, or requests, contact me at mariost6@gmail.com
