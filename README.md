@@ -32,11 +32,14 @@ Depending from where it's ran, the script runs in two modes:
   * If used from a folder with no 'saved' file, it inializes the series by playing the first episode and creating the saved file.
 
 Arguments:  
---help  
+--help / -h 
 Gives a brief of the way of usage.
 		
---check  
+--check / -h
 Only show guide for the chosen series, without playing.
+
+--ready / -r
+In the list of series, only show those with remaining unwatched episodes.
 
 --install  
 Automates the insertion of the alias in .bashrc.
