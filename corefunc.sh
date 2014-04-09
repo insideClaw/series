@@ -26,6 +26,15 @@ function presentSeries {
 		fi
 		# uses the variable formats, announced previously
 		total=$(find "$initialDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
+		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
+		if $onlyReady
+		then
+			if [ $saved -ge $total ]
+			then
+				count=$(( $count + 1 ));
+				continue;
+			fi
+		fi
 		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done

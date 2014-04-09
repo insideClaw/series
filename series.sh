@@ -10,18 +10,19 @@ scriptDir=$( dirname "${BASH_SOURCE[0]}" )
 # Makes the majority of the functions used available
 source $scriptDir/corefunc.sh
 # a sample movie files is are excluded. Add new formats here.
-formats='mkv\|mpe?g\|avi\|ts\|mp4'
+formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv'
 
 # Note: As the main script is called with source, exit would destroy the running shell, kill -SIGINT $$ is used instead.
 # Select mode and play, based on the mode given as argument
 inputMode=$1;
+onlyReady=false;
 case $inputMode in
 	--help | -h)
 		echo '-=- Usage: Run without arguments, either from home or a specific series directory. --check shows the series guide. Refer to README for details.'
 		kill -SIGINT $$; 
 		;;
 		
-	--check | check)
+	--check | -c)
 		echo '-=- Checking mode activated, will only show guide for the chosen series.'
 		chooseDirFromHome;
 		populateList;
@@ -50,6 +51,11 @@ case $inputMode in
 		kill -SIGINT $$;
 		;;
 	
+	--ready | -r)
+		onlyReady=true;
+		;;&
+		# because of the block terminator, next block is also evaluated
+
 	*) 
 		# only used if ran from ~, seeks to the series directory wanted
 		checkFirstRun;
