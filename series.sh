@@ -27,7 +27,13 @@ case $inputMode in
 		chooseDirFromHome;
 		populateList;
 		;;
-		
+
+	--rewind)
+		chooseDirFromHome;
+		rewindEpisode;
+		populateList;
+		;;
+
 	--install)
 		echo "alias series='source $(readlink -m "${BASH_SOURCE[0]}")'" >> ~/.bashrc
 		echo "-=- Alias appended to $HOME/.bashrc"

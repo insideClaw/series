@@ -144,3 +144,28 @@ function incrementSaved {
 	  echo $(( $epnumber + 1 )) > saved
 	fi
 }
+
+# Sets the next episode of the chosen series to one less.
+function rewindEpisode {
+	# ensure the saved file exists, if not, create one
+	if [ ! -f saved ]
+	then
+		echo 1 > saved
+	fi
+
+	# Do the rewinding, only if not already at the start
+	if [ $(cat saved) -le 1 ]
+	then
+		echo "-!- No previous episode to rewind to."
+	else
+		prev=$(( $(cat saved) - 1 ))
+		echo $prev > saved
+		echo "-=- Rewinded one episode."
+	fi
+
+	# Print a newline if the next episode(after possible rewinding) is not the first (the next episode surroundings have spacing)
+	if [ $(cat saved) -gt 1 ]
+	then
+		echo ""
+	fi
+}
