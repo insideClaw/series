@@ -41,6 +41,9 @@ Only show guide for the chosen series, without playing.
 --ready / -r
 In the list of series, only show those with remaining unwatched episodes.
 
+--rewind
+Sets the next episode of the chosen series to one less.
+
 --install  
 Automates the insertion of the alias in .bashrc.
 
