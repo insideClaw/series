@@ -1,15 +1,17 @@
+#!/bin/bash
 # Supplementary file to series.sh, contains a majority of the functions used.
 
-# Function level 1, lower level uses upper level functions
+# Function level 1, next section's functions use these
 ##########################################################
+
 function presentSeries {
-	# initialDir is already allocated, contains the directory the user specified as the directory, containing the series
+	# $seriesDir is already allocated
 	humanBit=1;
 	entryCount=0;
-	seriesAmount="$(ls $initialDir | wc -l)"
+	seriesAmount="$(ls $seriesDir | wc -l)"
 	while [ "$entryCount" -lt "$seriesAmount" ]
 	do
-	  nextToAdd="$(ls $initialDir | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
+	  nextToAdd="$(ls $seriesDir | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
 	  dir[$entryCount]=$nextToAdd;
 	  entryCount=$(( $entryCount+1 ))
 	done
@@ -18,14 +20,14 @@ function presentSeries {
 	# the $entryCount variable is the amount of entries in $dir
 	while [ "$count" -lt "$entryCount" ] 
 	do
-		saved=$( cat "$initialDir/${dir[$count]}/saved" 2>/dev/null )
+		saved=$( cat "$seriesDir/${dir[$count]}/saved" 2>/dev/null )
 		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
 		if [ "$saved" == "" ] || [ "$saved" == "-1" ]
 		then
 			saved="0"
 		fi
-		# uses the variable formats, announced previously
-		total=$(find "$initialDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
+		# uses the variable formats, announced previously		
+		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
 		if $onlyReady
 		then
@@ -44,6 +46,16 @@ function presentSeries {
 # Function level 0
 ##################
 
+function loadConfig {
+	# loads variables needed from the config file
+	if [ -f $configFile ] 
+	then
+		seriesDir="$(grep 'Directory:' $configFile | cut -f2 -d ':')"
+		player="$(grep 'Player:' $configFile | cut -f2 -d ':')"
+	else
+		echo "-!- No config file to load!"
+	fi
+}
 # it prepares a "list" file in advance, then prints its contents
 function showGuide {
 	# prints everything up to the next episode
@@ -71,11 +83,9 @@ function showGuide {
 	rm list listpure
 }
 
-# only used if ran from ~, seeks to the series directory wanted
+# only used if ran from ~, seeks to the series seriesDir wanted
 function chooseDirFromHome {
-	# eval is used so ~ is expanded
-	eval initialDir=$(cat $scriptDir/config.seriesDir)
-	player=$(cat $scriptDir/config.player)
+	# we have seriesDir and player variables available from loadConfig in main script
 	if [ "$(pwd)" == "$HOME" ]
 	then
 		echo "Series available:"
@@ -92,34 +102,60 @@ function chooseDirFromHome {
 		
 		choice=$(( $choice - humanBit)) # the choice entered was with human numericals in mind, revert it for computer use
 		echo "-=- ${dir[$choice]} decided!"
-		cd "$initialDir/${dir[$choice]}"
-	# if the current directory is a descendant of the series directory, continue script, otherwise don't proceed as if it's a series directory.
-	elif [ "$(pwd | grep $initialDir -o)" == "" ] || [ "$(pwd)" == "$initialDir" ] 
+		cd "$seriesDir/${dir[$choice]}"
+	# if the current seriesDir is a descendant of the series seriesDir, continue script, otherwise don't proceed as if it's a series seriesDir.
+	elif [ "$(pwd | grep $seriesDir -o)" == "" ] || [ "$(pwd)" == "$seriesDir" ] 
 	then
-		echo "-!- Use from ~ (home directory) for main menu, use from a series directory for direct play."
+		echo "-!- Use from ~ (home seriesDir) for main menu, use from a series seriesDir for direct play."
 		kill -SIGINT $$ # exit doesn't work, as the script is called with source
 	fi	
 }
-# gets the directory path from the file, asks user for first time setup if there it's not in the script's folder
-function checkFirstRun {	
-	# BASH_SOURCE[0] gets the script directory even if it was invoked with 'source <name>'
-	if [ ! -f $scriptDir/config.seriesDir ] 
+# gets the seriesDir path from the file, configure ~/.config/series/config
+function configure {	
+	# As the main script is called with source, exit would destroy the running shell, kill -SIGINT $$ is used instead.
+	echo "-=- Configuration started."
+	# we have $configFile available from main script definition
+	if [ "$(grep 'alias series=' ~/.bashrc)" == "" ]
 	then
-		echo '-?- First time use detected. Please specify the pathname of the series directory. Example: ~/videos/series.'
-		read initialDir
-		# outputs to the a new file in the script's folder
-		echo $initialDir > $scriptDir/config.seriesDir
-		echo '-=- Series directory initialized.'
+		echo "alias series='source $(readlink -m "${BASH_SOURCE[0]}")'" >> ~/.bashrc
+    	echo "-=- Alias appended to $HOME/.bashrc"
+	else
+		echo "-=- A series alias is already present in .bashrc, not adding anything"
 	fi
-	if [ ! -f $scriptDir/config.player ]
+	
+	# Create the config directory if it's not there, so creating the file works
+	configDir="$HOME/.config/series"
+	if [ ! -e $configDir ]
 	then
-		echo '-?- Please specify the video player which you want to use. Example: mplayer'
-		read player
-		echo $player > $scriptDir/config.player
-		echo '-=- $player selected.'
+		mkdir $configDir
+		echo "$configDir created."
+	fi
+
+	#Setting configuration for seriesDir
+	echo "-?- Please specify the pathname of the series directory. Example: ~/videos/series. Press enter to keep current. [$seriesDir]"
+	read seriesDirNew
+	if [ "$seriesDirNew" == "" ]
+	then
+		echo "-=- No changes to $seriesDir"
+	else
+		# eval is used to expand ~ ($HOME) 
+		eval seriesDir="$seriesDirNew"
+		echo "Directory:$seriesDir" > $configFile
+		echo "-=- Series directory changed to $seriesDir"
+	fi
+
+	#Setting configuration for mplayer
+	echo "-?- Please specify the name of the player to be used. Example: mplayer. Press enter to keep current. [$player]"
+	read playerNew
+	if [ "$playerNew" == "" ]
+	then
+		echo "-=- No changes to $player"
+	else
+		eval player="$playerNew"
+		echo "Player:$player" >> $configFile
+		echo "-=- Player used changed to $player"
 	fi
 }
-# create the file, containing the list of video files for that series
 function populateList {
 	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > listpure
 }
