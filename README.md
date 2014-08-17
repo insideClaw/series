@@ -32,32 +32,27 @@ Depending from where it's ran, the script runs in two modes:
   * If used from a folder with no 'saved' file, it inializes the series by playing the first episode and creating the saved file.
 
 Arguments:  
---help / -h 
-Gives a brief of the way of usage.
+-help / -h 
+  Gives a brief of the way of usage.
 		
---check / -h
-Only show guide for the chosen series, without playing.
+-check / -c
+  Only show guide for the chosen series, without playing.
 
---ready / -r
-In the list of series, only show those with remaining unwatched episodes.
+-ready / -r
+  In the list of series, only show those with remaining unwatched episodes.
 
---rewind
-Sets the next episode of the chosen series to one less.
+-back / -b
+  Sets the next episode of the chosen series to one less.
 
---install  
-Automates the insertion of the alias in .bashrc.
-
---newdir  
-Prompts for entering a new main series directory.
-
---newplayer  
-Prompts for entering a new player to be used.
+-set / -s  
+  Guides through setting up the config file.
 
 ##Additional details:
 
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * Can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
+* You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.
 
 **Contact**:  
 For any questions, comments, or requests, contact me at mariost6@gmail.com
