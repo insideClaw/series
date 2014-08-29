@@ -7,9 +7,10 @@ A bash script for automating selection and playing of series. Why have to rememb
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
 2. In a terminal, run:
 > cd <scriptDir>
-> . series.sh --install
+> . series.sh
 
-  * If you prefer to do it manually, add "alias series='source <scriptDir>/series.sh'" to your .bashrc. If you do it that way, specifying the series directory will be done upon first run, instead of during install.  
+  * As for the first time running, you will be guided through setting some basic configuration.
+  * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
 
 3. Open a new terminal or type 'bash' to renew the known aliases.
 
@@ -19,9 +20,9 @@ From home folder, just run without arguments to begin usage.
 
 > series
 
-On first run, if asked, provide the directory, containing only the series you watch. The guide's contents are based on the folders available.
+On first run, if asked, provide the directory, containing all the the series you want to have included. The guide's contents (available titles) are based on the folders immediately (non-recursively) located in the series directory you provide.
 
-Depending from where it's ran, the script runs in two modes:
+Depending on where it's ran from, the script runs in two modes:
 
 1. Guide mode:  
   When invoked from ~, choose the index of series to watch.  
@@ -29,22 +30,22 @@ Depending from where it's ran, the script runs in two modes:
 
 2. Direct in-folder mode  
   When invoked from a series folder, play the next episode of that series.  
-  * If used from a folder with no 'saved' file, it inializes the series by playing the first episode and creating the saved file.
+  * If used from a folder with no 'saved' file, it initializes the series by playing the first episode and creating the saved file.
 
 Arguments:  
--help / -h 
+-h (help)
   Gives a brief of the way of usage.
 		
--check / -c
+-c (check)
   Only show guide for the chosen series, without playing.
 
--ready / -r
+-r (ready)
   In the list of series, only show those with remaining unwatched episodes.
 
--back / -b
+-b (back)
   Sets the next episode of the chosen series to one less.
 
--set / -s  
+-s (set)  
   Guides through setting up the config file.
 
 ##Additional details:
