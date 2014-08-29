@@ -10,6 +10,7 @@
 
 # BASH_SOURCE[0] gets the script directory even if it was invoked with 'source <name>'
 scriptDir=$( dirname "${BASH_SOURCE[0]}" )
+configFile="$HOME/.config/series/config"
 # Sample movie files are excluded. Add new formats here.
 formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv'
 # Default options used, simple playback with extras disabled
@@ -67,15 +68,15 @@ done
 
 #===== Running logic =====
 
-# if the config file doesn't exist or the reconfigure flag is called, call the config function
-configFile="$HOME/.config/series/config"
+# tries to load variables from config file to make them available to use in further functions
+loadConfig;
+
+# if the config file doesn't exist or the reconfigure flag is called, call the configation function
 if [ ! -e $configFile ] || $reconfigure
 then
 	configure;
 fi
 
-# loads variables from config file to make them available to use in further functions
-loadConfig;
 # only used if ran from ~, seeks to the series directory wanted
 chooseDirFromHome;
 # create the file, containing the list of video files for that series
