@@ -14,15 +14,18 @@ configFile="$HOME/.config/series/config"
 # Sample movie files are excluded. Add new formats here.
 formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv'
 # Default options used, simple playback with extras disabled
-playNext=true
+playMode=true
 rewind=false
 onlyReady=false
 reconfigure=false
+endless=false
 
 # As the main script is called with source, exit would destroy the running shell, kill -SIGINT $$ is used instead.
 quit() {
 	kill -SIGINT $$
 }
+
+#TODO: If series -r | grep 'Akame', doesn't work as intended
 
 # Makes the majority of the functions used available
 source $scriptDir/corefunc.sh
@@ -32,8 +35,8 @@ source $scriptDir/corefunc.sh
 # Explicit OPTIND reset, as it's retained between runs because of sourcing the script
 OPTIND=1
 # Select mode and play, based on the mode given as argument
-while getopts "hcbrs" inputMode
-	do
+while getopts "hcbrse" inputMode
+do
 	case $inputMode in
 		-help | h)
 			echo '-=- Help: Run without arguments, either from home or a specific series directory. --check shows the series guide. Refer to README for details.'
@@ -41,7 +44,7 @@ while getopts "hcbrs" inputMode
 			;;
 
 		-check | c)
-			playNext=false;
+			playMode=false;
 			echo '-=- Checking mode activated, inhibits playing, will only show guide for the chosen series.'
 			;;
 
@@ -58,6 +61,11 @@ while getopts "hcbrs" inputMode
 		-set | s)
 			echo "-=- Redoing configuration, asking for details. "
 			reconfigure=true;
+			;;
+
+		-endless | e)
+			echo "-=- Endless mode, play ALL the episodes!"
+			endless=true;
 			;;
 
 		\?)
@@ -87,11 +95,18 @@ if $rewind
 then
 	rewindEpisode;
 fi
+
 # having the details of the episode settled, play the desired file, then increment the next episode counter
-if $playNext
+if $playMode
 then
 	playNext;
 	incrementSaved;
+fi
+
+# If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped
+if $playMode && $endless
+then
+	loopPlaying;
 fi
 
 # Prints a guide of available series and episodes at the end 
