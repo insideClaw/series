@@ -48,10 +48,13 @@ Arguments:
 -s (set)  
   Guides through setting up the config file.
 
+-e (endless)
+  Endless mode, continuous playback of episodes - until episodes run out or script stopped with CTRL-C.
+
 ##Additional details:
 
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
-* Can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
+* 'saved' file can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
 * You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.
 

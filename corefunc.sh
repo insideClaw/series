@@ -41,6 +41,14 @@ function presentSeries {
 		count=$(( $count + 1 ));
 	done
 }
+function checkNextEpisode {
+	if	[ "$(cat saved)" -le "$(cat listpure | wc -l)" ]
+	then 
+		nextEpisodeAvailable=true;
+	else
+		nextEpisodeAvailable=false;
+	fi
+}
 
 
 # Function level 0
@@ -106,7 +114,7 @@ function chooseDirFromHome {
 	# if the current seriesDir is a descendant of the series seriesDir, continue script, otherwise don't proceed as if it's a series seriesDir.
 	elif [ "$(pwd | grep $seriesDir -o)" == "" ] || [ "$(pwd)" == "$seriesDir" ] 
 	then
-		echo "-!- Use from ~ (home seriesDir) for main menu, use from a series seriesDir for direct play."
+		echo "-!- Use from ~ (home) for main menu, use from a series seriesDir for direct play."
 		kill -SIGINT $$ # exit doesn't work, as the script is called with source
 	fi	
 }
@@ -159,6 +167,20 @@ function configure {
 function populateList {
 	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > listpure
 }
+# Continuous playback and countdown between plays, for when endless mode is specified
+function loopPlaying {
+	checkNextEpisode;
+	while $nextEpisodeAvailable
+	do
+		# read is used as a echo+sleep+character suppress mechanism
+		read -s -p "-=- Playing next episode in 3..." -t 1
+		read -s -p "2..." -t 1
+		read -s -p "1..." -t 1
+		playNext;
+		incrementSaved;
+		checkNextEpisode;
+	done
+}
 # having the details of the episode settled, play the desired file
 function playNext {
 	# ensure the saved file exists, if not, create one
@@ -167,10 +189,11 @@ function playNext {
 	  echo 1 > saved
 	fi
 	epnumber=$(cat saved)
-	if [ "$(cat saved)" -le "$(cat listpure | wc -l)" ] # if there is at least one more episode
+	checkNextEpisode;
+	if $nextEpisodeAvailable # if there is at least one more episode
 	then
-	  #mplayer "$(cat listpure | head -$epnumber | tail -1)" -alang jpn,Japanese,eng,English -slang eng,English
-	  $player "$(cat listpure | head -$epnumber | tail -1)" 
+	  # input is taken from /dev/null to make sure a nasty 'q' keystroke doesn't get queue up in between episodes
+	  $player "$(cat listpure | head -$epnumber | tail -1)" < /dev/null
 	fi
 }
 # after everything is completed, increment the next episode counter
