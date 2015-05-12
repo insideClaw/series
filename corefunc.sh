@@ -8,10 +8,14 @@ function presentSeries {
 	# $seriesDir is already allocated
 	humanBit=1;
 	entryCount=0;
-	seriesAmount="$(ls $seriesDir | wc -l)"
+	# Evaluate the folder only once for performance
+	ls $seriesDir > /tmp/series/seriesDirContents
+
+	# Use the folder contents that are were fetched earlier
+	seriesAmount="$(cat /tmp/series/seriesDirContents | wc -l)"
 	while [ "$entryCount" -lt "$seriesAmount" ]
 	do
-	  nextToAdd="$(ls $seriesDir | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
+	  nextToAdd="$(cat /tmp/series/seriesDirContents | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
 	  dir[$entryCount]=$nextToAdd;
 	  entryCount=$(( $entryCount+1 ))
 	done
@@ -37,12 +41,13 @@ function presentSeries {
 				continue;
 			fi
 		fi
-		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" # present the uncomfortable to press 0 into a 1
+		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
+	cat /tmp/series/presentableSeries
 }
 function checkNextEpisode {
-	if	[ "$(cat saved)" -le "$(cat listpure | wc -l)" ]
+	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l)" ]
 	then 
 		nextEpisodeAvailable=true;
 	else
@@ -63,32 +68,52 @@ function loadConfig {
 	else
 		echo "-!- No config file to load!"
 	fi
+
+	# Verify /tmp is writable and make a tmp folder there available
+	openCleanTemp;
+
 }
-# it prepares a "list" file in advance, then prints its contents
+function openCleanTemp {
+	# Clean the temp folder we use if there is one, create otherwise. This way works better as placing traps on exit doesn't work well with sourcing scripts.
+	if [ -e /tmp/series ]
+	then
+		rm -rf /tmp/series/*
+	else
+		mkdir /tmp/series
+	fi
+
+	# Error handling
+	if [ $? != 0 ]
+	then
+		echo "-!- Error: Please make sure /tmp is writeable."
+		kill -SIGINT $$ # exit doesn't work, as the script is called with source
+	fi
+}
+# it prepares a "/tmp/series/list" file in advance, then prints its contents
 function showGuide {
 	# prints everything up to the next episode
 	lastDone=$(( $(cat saved) - 1 )) # gets the next episode to watch from saved, then subtracts one for last ep watched
-	cat listpure | head -$lastDone > list
+	cat /tmp/series/listpure | head -$lastDone > /tmp/series/list
 
 	# prints the structure surrounding and the name of the next episode
-	echo "" >> list # literally makes a new line, better outlook
-	if [ $(cat saved) -le $(cat listpure | wc -l) ]
+	echo "" >> /tmp/series/list # literally makes a new line, better outlook
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
 	then
-	  echo "> $(cat listpure | head -$(cat saved) | tail -1)" >> list
+	  echo "> $(cat /tmp/series/listpure | head -$(cat saved) | tail -1)" >> /tmp/series/list
 	else
-	  echo "> Umad? No next episode available" >> list
+	  echo "> Umad? No next episode available" >> /tmp/series/list
 	fi
-	echo "" >> list
+	echo "" >> /tmp/series/list
 
 	# prints everything after the singled out episode
 	savedVar=$(cat saved)
 	savedUp=$(($savedVar + 1 ))
-	cat listpure | tail -n +$savedUp >> list
+	cat /tmp/series/listpure | tail -n +$savedUp >> /tmp/series/list
 	
 	# do the actual printing from file, displayRange refines the outlook for large series
 	displayRange="$(( $(cat saved) + 20 ))"
-	cat list | head -$displayRange
-	rm list listpure
+	cat /tmp/series/list | head -$displayRange
+	rm /tmp/series/list /tmp/series/listpure
 }
 
 # only used if ran from ~, seeks to the series seriesDir wanted
@@ -114,7 +139,7 @@ function chooseDirFromHome {
 	# if the current seriesDir is a descendant of the series seriesDir, continue script, otherwise don't proceed as if it's a series seriesDir.
 	elif [ "$(pwd | grep $seriesDir -o)" == "" ] || [ "$(pwd)" == "$seriesDir" ] 
 	then
-		echo "-!- Use from ~ (home) for main menu, use from a series seriesDir for direct play."
+		echo "-!- Use from ~ (home) for main menu, use from a series in $seriesDir for direct play."
 		kill -SIGINT $$ # exit doesn't work, as the script is called with source
 	fi	
 }
@@ -165,10 +190,18 @@ function configure {
 	fi
 }
 function populateList {
-	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > listpure
+	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > /tmp/series/listpure
+	# ensure the saved file exists, if not, create one
+	if [ ! -f saved ]
+	then
+	  echo 1 > saved
+	  echo "-=- Initialized new series from episode 1."
+	fi
 }
 # Continuous playback and countdown between plays, for when endless mode is specified
 function loopPlaying {
+	# TODO: Make an improvised do while loop, like...
+	# TODO: i=0; while $i -le 2 ; echo gg && ((i++)); do :; done
 	checkNextEpisode;
 	while $nextEpisodeAvailable
 	do
@@ -183,22 +216,17 @@ function loopPlaying {
 }
 # having the details of the episode settled, play the desired file
 function playNext {
-	# ensure the saved file exists, if not, create one
-	if [ ! -f saved ]
-	then
-	  echo 1 > saved
-	fi
 	epnumber=$(cat saved)
 	checkNextEpisode;
 	if $nextEpisodeAvailable # if there is at least one more episode
 	then
 	  # input is taken from /dev/null to make sure a nasty 'q' keystroke doesn't get queue up in between episodes
-	  $player "$(cat listpure | head -$epnumber | tail -1)" < /dev/null
+	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" < /dev/null
 	fi
 }
 # after everything is completed, increment the next episode counter
 function incrementSaved {
-	if [ $(cat saved) -le $(cat listpure | wc -l) ]
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
 	then
 	  echo $(( $epnumber + 1 )) > saved
 	fi
