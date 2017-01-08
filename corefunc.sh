@@ -1,7 +1,10 @@
 #!/bin/bash
-# Supplementary file to series.sh, contains a majority of the functions used.
+#
+# Script: corefunc.sh
+# Desc: Supplementary file to series.sh, contains a majority of the functions used.
+#
+# Author: Mario Staykov
 
-# Function level 1, next section's functions use these
 ##########################################################
 
 function presentSeries {
@@ -22,14 +25,34 @@ function presentSeries {
 	
 	count=0;
 	# the $entryCount variable is the amount of entries in $dir
+	echo "-=- Total: $entryCount series detected. Beginning parsing..."
 	while [ "$count" -lt "$entryCount" ] 
 	do
+		echo -n "$count "
 		saved=$( cat "$seriesDir/${dir[$count]}/saved" 2>/dev/null )
-		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
-		if [ "$saved" == "" ] || [ "$saved" == "-1" ]
+		if [ "$saved" == "" ]
 		then
-			saved="0"
+			# File has proven to be empty, assume we're not watched anything
+			saved=1
+		# Verify value is a valid integer (comparable) and not a sneaky string (previously caused unintended behaviour and crash within the loop)
+		elif [ "$saved" -gt 0 ] 2>/dev/null
+		then 
+			:
+		else	
+			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid or present. File must contain only one integer larger than 0."
+			echo "-?- Would you like to set it to the first episode? Press enter to keep do so now, otherwise re-run script after fixing it yourself."
+			read "resetDecision"
+			if [ "$resetDecision" == "" ]
+			then
+				saved=1
+				echo "$saved" > "$seriesDir/${dir[$count]}/saved" 
+				echo "-=- Saved file reset."
+			else
+				echo "-!- Reset of saved file not chosen, exiting as file is currently non-valid (needs integer >=1)."
+				exit 1
+			fi
 		fi
+		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
 		# uses the variable formats, announced previously		
 		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
@@ -44,6 +67,7 @@ function presentSeries {
 		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
+	echo -e "\n";
 	cat /tmp/series/presentableSeries
 }
 function checkNextEpisode {
@@ -55,9 +79,7 @@ function checkNextEpisode {
 	fi
 }
 
-
-# Function level 0
-##################
+##########################################################
 
 function loadConfig {
 	# loads variables needed from the config file
@@ -214,14 +236,21 @@ function loopPlaying {
 		checkNextEpisode;
 	done
 }
+# interpret user flags given into parameters to pass to player
+function fillParams {
+	if [ $volmax ]; then
+		params="-softvol-max 600 -softvol"
+	fi
+}
 # having the details of the episode settled, play the desired file
 function playNext {
 	epnumber=$(cat saved)
 	checkNextEpisode;
+	fillParams;
 	if $nextEpisodeAvailable # if there is at least one more episode
 	then
 	  # input is taken from /dev/null to make sure a nasty 'q' keystroke doesn't get queue up in between episodes
-	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" < /dev/null
+	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
 	fi
 }
 # after everything is completed, increment the next episode counter

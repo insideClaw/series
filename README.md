@@ -51,6 +51,9 @@ Arguments:
 -e (endless)
   Endless mode, continuous playback of episodes - until episodes run out or script stopped with CTRL-C.
 
+-l (volume)
+  mplayer-only switch, passes the parameters "--softvol-max 600 -softvol" in order to allow volume of sounds past the usual 100%.
+
 ##Additional details:
 
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
