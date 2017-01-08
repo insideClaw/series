@@ -25,8 +25,6 @@ quit() {
 	kill -SIGINT $$
 }
 
-#TODO: If series -r | grep 'Akame', doesn't work as intended
-
 # Makes the majority of the functions used available
 source $scriptDir/corefunc.sh
 
@@ -35,7 +33,7 @@ source $scriptDir/corefunc.sh
 # Explicit OPTIND reset, as it's retained between runs because of sourcing the script
 OPTIND=1
 # Select mode and play, based on the mode given as argument
-while getopts "hcbrse" inputMode
+while getopts "hcbrsel" inputMode
 do
 	case $inputMode in
 		-help | h)
@@ -66,6 +64,11 @@ do
 		-endless | e)
 			echo "-=- Endless mode, play ALL the episodes!"
 			endless=true;
+			;;
+
+		-volume | l)
+			echo "-=- Maximum volume for mplayer increased."
+			volmax=true;
 			;;
 
 		\?)
