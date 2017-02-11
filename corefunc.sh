@@ -172,18 +172,23 @@ function configure {
 	# we have $configFile available from main script definition
 	if [ "$(grep 'alias series=' ~/.bashrc)" == "" ]
 	then
-		echo "alias series='source $(readlink -m "${BASH_SOURCE[0]}")'" >> ~/.bashrc
+		#Fix needed to add ./series to alias and not ./corefunc. Should be fine unless someone goes around changing the name of corefunc.sh!
+		mainScriptName=$(readlink -m "${BASH_SOURCE[0]}" | sed s/corefunc/series/)
+		echo "alias series='source $mainScriptName'" >> ~/.bashrc
     	echo "-=- Alias appended to $HOME/.bashrc"
 	else
 		echo "-=- A series alias is already present in .bashrc, not adding anything"
 	fi
 	
-	# Create the config directory if it's not there, so creating the file works
+	# Create the config directory if it's not there, so creating the file works. Create even ~/.config if not there (check first).
 	configDir="$HOME/.config/series"
-	if [ ! -e $configDir ]
-	then
+	if [ ! -e "$HOME/.config" ]; then
+		mkdir "$HOME/.config"
+		echo "-=- .config directory created under home."
+	fi
+	if [ ! -e $configDir ];then
 		mkdir $configDir
-		echo "$configDir created."
+		echo "-=- $configDir created."
 	fi
 
 	#Setting configuration for seriesDir
