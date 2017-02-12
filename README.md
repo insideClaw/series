@@ -9,10 +9,12 @@ A bash script for automating selection and playing of series. Why have to rememb
 > cd <scriptDir>
 > . series.sh
 
-  * As for the first time running, you will be guided through setting some basic configuration.
+  * If running for the first time, you will be guided through setting some basic configuration.
   * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
 
 3. Open a new terminal or type 'bash' to renew the known aliases.
+
+Note: Confirmed to run on Windows, under an out-of-the-box Cygwin environment. Same instructions apply, only you provide the full path for a Windows player of your choice.
 
 ##Usage:
 
