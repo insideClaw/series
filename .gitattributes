@@ -1,0 +1,2 @@
+# Ensure all Bash files use CF.
+*.sh         eol=lf
