@@ -3,7 +3,7 @@ series
 
 A bash script for automating selection and playing of series. Why have to remember which episode of a series to watch next...
 
-##Install:
+## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
 2. In a terminal, run:
 > cd <scriptDir>
@@ -16,7 +16,7 @@ A bash script for automating selection and playing of series. Why have to rememb
 
 Note: Confirmed to run on Windows, under an out-of-the-box Cygwin environment. Same instructions apply, only you provide the full path for a Windows player of your choice.
 
-##Usage:
+## Usage:
 
 From home folder, just run without arguments to begin usage.
 
@@ -56,7 +56,7 @@ Arguments:
 -l (volume)
   mplayer-only switch, passes the parameters "--softvol-max 600 -softvol" in order to allow volume of sounds past the usual 100%.
 
-##Additional details:
+## Additional details:
 
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * 'saved' file can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
