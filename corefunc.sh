@@ -265,7 +265,6 @@ function incrementSaved {
 	  echo $(( $epnumber + 1 )) > saved
 	fi
 }
-
 # Sets the next episode of the chosen series to one less.
 function rewindEpisode {
 	# ensure the saved file exists, if not, create one
@@ -289,4 +288,29 @@ function rewindEpisode {
 	then
 		echo ""
 	fi
+}
+# Verify that there are no missing episodes from a regular E09,E10,E11, etc. sequence
+function sequentialConsistencyCheck {
+	
+	regex='(?<=S..E)..'
+	episodeExpected=1
+	cat /tmp/series/listpure | while read line; do
+	#for line in $(cat /tmp/series/listpure); do
+		episodeCurrent="$(echo "$line" | grep -oP $regex)"
+		# Sanity check that episodes can be found, by checking if value is integer
+		if ! [[ "$episodeCurrent" =~ ^[0-9]+$ ]]
+		then
+			echo "-!- Series doesn't seem to follow the standard S01E01 structure - quitting. Disable option with -q."
+			quit
+			break
+		fi
+
+		if [ ! $episodeCurrent -eq $episodeExpected ]; then
+			echo "-!- Inconsistency in episode sequence found! Expected E$episodeExpected but found $line! Correct or disable with -q."
+			quit
+			break
+		fi
+		episodeExpected=$(( episodeExpected + 1 ))
+	done
+	echo "-=- Sequential consistency check passed."
 }

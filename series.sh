@@ -19,6 +19,7 @@ rewind=false
 onlyReady=false
 reconfigure=false
 endless=false
+seqcheck=true
 
 # As the main script is called with source, exit would destroy the running shell, kill -SIGINT $$ is used instead.
 quit() {
@@ -32,8 +33,8 @@ source $scriptDir/corefunc.sh
 
 # Explicit OPTIND reset, as it's retained between runs because of sourcing the script
 OPTIND=1
-# Select mode and play, based on the mode given as argument
-while getopts "hcbrsel" inputMode
+# Select mode and play, based on the mode given as argument; getops doesn't handle long parameters
+while getopts "hcbrselq" inputMode
 do
 	case $inputMode in
 		-help | h)
@@ -70,6 +71,11 @@ do
 			echo "-=- Maximum volume for mplayer increased."
 			volmax=true;
 			;;
+			
+		-noseq | q)
+			echo "-=- Skipping sequential consistency check."
+			seqcheck=false;
+			;;
 
 		\?)
 			echo "-!- Unrecognized parameter. Try again or -h for help."
@@ -99,6 +105,11 @@ then
 	rewindEpisode;
 fi
 
+if $seqcheck
+then
+	sequentialConsistencyCheck;
+fi
+	
 # having the details of the episode settled, play the desired file, then increment the next episode counter
 if $playMode
 then
