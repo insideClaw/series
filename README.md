@@ -55,6 +55,9 @@ Arguments:
 
 -l (volume)
   mplayer-only switch, passes the parameters "--softvol-max 600 -softvol" in order to allow volume of sounds past the usual 100%.
+  
+-q (noseq)
+  disables the sequential consistency check, in order to play series that don't conform to the regular naming convention (yet)
 
 ## Additional details:
 
