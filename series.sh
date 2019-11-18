@@ -115,7 +115,7 @@ then
 	sequentialConsistencyCheck;
 fi
 
-case $playMode in
+case "$playMode" in
 	normal)
 		# having the details of the episode settled, play the desired file, then increment the next episode counter
 		playNext;
