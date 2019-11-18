@@ -14,7 +14,7 @@ configFile="$HOME/.config/series/config"
 # Sample movie files are excluded. Add new formats here.
 formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv'
 # Default options used, simple playback with extras disabled
-playMode=true
+playMode="normal"
 rewind=false
 onlyReady=false
 reconfigure=false
@@ -77,6 +77,11 @@ do
 			seqcheck=false;
 			;;
 
+		-random | x)
+		  echo "-=- Random ranking mode, playing a random episode not been seen for a while!"
+			playMode="random"
+			;;
+
 		\?)
 			echo "-!- Unrecognized parameter. Try again or -h for help."
 			quit;
@@ -109,19 +114,22 @@ if $seqcheck
 then
 	sequentialConsistencyCheck;
 fi
-	
-# having the details of the episode settled, play the desired file, then increment the next episode counter
-if $playMode
-then
-	playNext;
-	incrementSaved;
-fi
+
+case $playMode in
+	normal)
+		# having the details of the episode settled, play the desired file, then increment the next episode counter
+		playNext;
+		incrementSaved;
+		;;
+	random)
+	  playRandom;
+esac
 
 # If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped
-if $playMode && $endless
+if "$playMode" == "normal" && $endless
 then
 	loopPlaying;
 fi
 
-# Prints a guide of available series and episodes at the end 
+# Prints a guide of available series and episodes at the end
 showGuide;
