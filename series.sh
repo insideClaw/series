@@ -77,9 +77,9 @@ do
 			seqcheck=false;
 			;;
 
-		-random | x)
-		  echo "-=- Random ranking mode, playing a random episode not been seen for a while!"
-			playMode="random"
+		-rankedrandom | x)
+		  echo "-=- Random ranking mode, playing a random episode not seen for a while!"
+			playMode="rankedRandom"
 			;;
 
 		\?)
@@ -122,7 +122,7 @@ case $playMode in
 		incrementSaved;
 		;;
 	random)
-	  playRandom;
+	  playRankedRandom;
 esac
 
 # If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped
