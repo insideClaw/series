@@ -71,8 +71,8 @@ do
 			echo "-=- Maximum volume for mplayer increased."
 			volmax=true;
 			;;
-			
-		-noseq | q)
+
+		-quietnoseq | q)
 			echo "-=- Skipping sequential consistency check."
 			seqcheck=false;
 			;;
