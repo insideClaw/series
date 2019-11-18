@@ -121,7 +121,7 @@ case $playMode in
 		playNext;
 		incrementSaved;
 		;;
-	random)
+	rankedRandom)
 	  playRankedRandom;
 esac
 
