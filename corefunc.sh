@@ -259,7 +259,16 @@ function playNext {
 	fi
 }
 function playRankedRandom {
+	fillParams;
+	selectRandomEpisode;
+	$player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
+}
+function selectRankedRandomEpisode {
+	# At first, just make it pick at random
+	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
+	epnumber="$(( $RANDOM % $totalEpisodesAvailable ))"
 
+	# TODO: Create a file that contains seen episodes, so that a clever method of ranking can be made
 }
 # after everything is completed, increment the next episode counter
 function incrementSaved {
