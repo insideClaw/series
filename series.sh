@@ -34,7 +34,7 @@ source $scriptDir/corefunc.sh
 # Explicit OPTIND reset, as it's retained between runs because of sourcing the script
 OPTIND=1
 # Select mode and play, based on the mode given as argument; getops doesn't handle long parameters
-while getopts "hcbrselq" inputMode
+while getopts "hcbrselqx" inputMode
 do
 	case $inputMode in
 		-help | h)
@@ -78,7 +78,7 @@ do
 			;;
 
 		-rankedrandom | x)
-		  echo "-=- Random ranking mode, playing a random episode not seen for a while!"
+		    echo "-=- Random ranking mode, playing a random episode not seen for a while!"
 			playMode="rankedRandom"
 			;;
 
@@ -121,13 +121,16 @@ case "$playMode" in
 		playNext;
 		incrementSaved;
 		;;
+
 	rankedRandom)
-	  playRankedRandom;
+	    playRankedRandom;
+		echo "finished"
 esac
 
 # If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped
-if "$playMode" == "normal" && $endless
+if [ "$playMode" == "normal" ] && $endless
 then
+	echo "BAU"
 	loopPlaying;
 fi
 
