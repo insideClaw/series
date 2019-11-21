@@ -85,6 +85,7 @@ function loadConfig {
 	# loads variables needed from the config file
 	if [ -f $configFile ]
 	then
+		# TODO: Add if conditions for getting DirectoryWatched when "-x" is supplied; also add it above for creating the config file
 		seriesDir="$(grep 'Directory:' $configFile | cut -f2 -d ':')"
 		player="$(grep 'Player:' $configFile | cut -f2 -d ':')"
 	else
