@@ -298,6 +298,7 @@ function selectRankedRandomEpisode {
 		suspectEpisode=$1
 		for s in $spentEpisodes; do
 			if [ $suspectEpisode -eq $s ]; then
+				echo "-Debug- Found you."
 				episodeIsFresh= False
 				break
 			fi
@@ -305,9 +306,9 @@ function selectRankedRandomEpisode {
 	}
 	function obtainUnseenEpisode {
 		# As long as the episode rolled is matched on the list of spent ones, reroll again
-		until $episodeIsFresh; do
+		until [ $episodeIsFresh == True ]; do
 			rollRandomEpisode;
-			checkIfEpisodeIsSpent $epnumber;
+			checkIfEpisodeIsFresh $epnumber;
 		done
 	}
 
