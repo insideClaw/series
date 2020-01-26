@@ -292,22 +292,22 @@ function selectRankedRandomEpisode {
 		echo "$epToInvalidate" >> rr-spent-episodes
 	}
 
- 	function episodeIsSpent {
-		# Assume episode is not spent then try and prove it is by matching to the list
-		episodeIsSpent= False
+ 	function checkIfEpisodeIsFresh {
+		# Assume episode is fresh then prove it's not by matching to the list
+		episodeIsFresh= True
 		suspectEpisode=$1
 		for s in $spentEpisodes; do
 			if [ $suspectEpisode -eq $s ]; then
-				episodeIsSpent= True
+				episodeIsFresh= False
 				break
 			fi
 	  done
 	}
 	function obtainUnseenEpisode {
 		# As long as the episode rolled is matched on the list of spent ones, reroll again
-		rollRandomEpisode;
-		while episodeIsSpent $epnumber; do
+		until $episodeIsFresh; do
 			rollRandomEpisode;
+			checkIfEpisodeIsSpent $epnumber;
 		done
 	}
 
