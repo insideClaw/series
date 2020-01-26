@@ -261,19 +261,47 @@ function playNext {
 }
 # Select a random episode only from those not watched in the current batch
 function selectRankedRandomEpisode {
-	# TODO: Create a file that contains seen episodes, so that a clever method of ranking can be made
+	# Roll a random number out of the total
 	function rollRandomEpisode {
 		epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
 	}
+	# Episodes that are not eligible for next playtime
+	function getSpentEpisodeList {
+		# Create/reset an empty indexed array
+		spentEpisodes=()
+		# Create the file if not there
+		if [ ! -e 'saved' ]; then
+			echo "" > rr-spent-episodes
+		fi
+
+		# Blacklist every episode noted down in the file
+		for line in $(cat rr-spent-episodes); do
+			spentEpisodes+=($line)
+		done
+
+		# If all the episodes are spent, start over
+		if [ ${#spentEpisodes[@]} -ge $totalEpisodesAvailable ]; then
+			echo "" > rr-spent-episodes
+			spentEpisodes=[]
+		fi
+	}
+	function markEpisodeAsSpent {
+		epToInvalidate=$1
+		echo "$epToInvalidate" >> rr-spent-episodes
+	}
 	# Gather how many we have in total
 	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
-	# Episodes are not eligible for next  #TODO: Replace with input from file
-	spentEpisodeList=['1','2']
+
+	# Get info about which episodes are to be ignored
+	getSpentEpisodeList;
 
 	# As long as the episode rolled is matched on the list of spent ones, reroll
-	while rollRandomEpisode && $(echo $spentEpisodeList | grep -q $epnumber); do echo "Rerolling $epnumber"; done
+	# TODO: Fix that the grep method will consider 4 as spent when encountering 14
+	while rollRandomEpisode && $(echo $spentEpisodes | grep -q $epnumber); do echo "Rerolling $epnumber"; done
 
-  # TODO: List should reset only when all episodes are in it
+	# Mark episode as spent now that we're going to start it
+	markEpisodeAsSpent $epnumber;
+
 }
 function playRankedRandom {
 	# Pick and play a rankedRandom episode
