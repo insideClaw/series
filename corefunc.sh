@@ -270,7 +270,7 @@ function selectRankedRandomEpisode {
 		# Create/reset an empty indexed array
 		spentEpisodes=()
 		# Create the file if not there
-		if [ ! -e 'saved' ]; then
+		if [ ! -e 'rr-spent-episodes' ]; then
 			echo "" > rr-spent-episodes
 		fi
 
@@ -282,13 +282,14 @@ function selectRankedRandomEpisode {
 		# If all the episodes are spent, start over
 		if [ ${#spentEpisodes[@]} -ge $totalEpisodesAvailable ]; then
 			echo "" > rr-spent-episodes
-			spentEpisodes=[]
+			spentEpisodes=()
 		fi
 	}
 	function markEpisodeAsSpent {
 		epToInvalidate=$1
 		echo "$epToInvalidate" >> rr-spent-episodes
 	}
+
 	# Gather how many we have in total
 	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
 
