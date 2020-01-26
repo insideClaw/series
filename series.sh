@@ -124,7 +124,6 @@ case "$playMode" in
 
 	rankedRandom)
 	    playRankedRandom;
-		echo "finished"
 esac
 
 # If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped

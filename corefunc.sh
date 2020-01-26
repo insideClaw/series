@@ -263,7 +263,6 @@ function playNext {
 function selectRankedRandomEpisode {
 	# Roll a random number out of the total
 	function rollRandomEpisode {
-		echo "-Debug- Rerolling $epnumber";
 		epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
 	}
 	# Episodes that are not eligible for next playtime
@@ -273,7 +272,7 @@ function selectRankedRandomEpisode {
 		# Create the file if not there
 		if [ ! -e 'rr-spent-episodes' ]; then
 			touch rr-spent-episodes
-			echo "-=- Initializing spent episode list."
+			echo "-=- Initializing empty spent episode list."
 		fi
 
 		# Blacklist every episode noted down in the file
@@ -283,7 +282,7 @@ function selectRankedRandomEpisode {
 
 		# If all the episodes are spent, start over
 		if [ ${#spentEpisodes[@]} -ge $totalEpisodesAvailable ]; then
-			rm rr-spent-episodes
+			rm -f rr-spent-episodes
 			getSpentEpisodeList;
 		fi
 	}
@@ -294,19 +293,20 @@ function selectRankedRandomEpisode {
 
  	function checkIfEpisodeIsFresh {
 		# Assume episode is fresh then prove it's not by matching to the list
-		episodeIsFresh= True
+		episodeIsFresh=true
 		suspectEpisode=$1
-		for s in $spentEpisodes; do
+		for s in ${spentEpisodes[@]}; do
 			if [ $suspectEpisode -eq $s ]; then
-				echo "-Debug- Found you."
-				episodeIsFresh= False
+				episodeIsFresh=False
 				break
 			fi
-	  done
+		done
+
 	}
 	function obtainUnseenEpisode {
 		# As long as the episode rolled is matched on the list of spent ones, reroll again
-		until [ $episodeIsFresh == True ]; do
+		episodeIsFresh=false
+		until [ "$episodeIsFresh" == true ]; do
 			rollRandomEpisode;
 			checkIfEpisodeIsFresh $epnumber;
 		done
