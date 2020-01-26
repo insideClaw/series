@@ -263,6 +263,7 @@ function playNext {
 function selectRankedRandomEpisode {
 	# Roll a random number out of the total
 	function rollRandomEpisode {
+		echo "-Debug- Rerolling $epnumber";
 		epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
 	}
 	# Episodes that are not eligible for next playtime
@@ -291,17 +292,35 @@ function selectRankedRandomEpisode {
 		echo "$epToInvalidate" >> rr-spent-episodes
 	}
 
+ 	function episodeIsSpent {
+		# Assume episode is not spent then try and prove it is by matching to the list
+		episodeIsSpent= False
+		suspectEpisode=$1
+		for s in $spentEpisodes; do
+			if [ $suspectEpisode -eq $s ]; then
+				episodeIsSpent= True
+				break
+			fi
+	  done
+	}
+	function obtainUnseenEpisode {
+		# As long as the episode rolled is matched on the list of spent ones, reroll again
+		rollRandomEpisode;
+		while episodeIsSpent $epnumber; do
+			rollRandomEpisode;
+		done
+	}
+
 	# Gather how many we have in total
 	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
 
 	# Get info about which episodes are to be ignored
 	getSpentEpisodeList;
 
-	# As long as the episode rolled is matched on the list of spent ones, reroll
-	# TODO: Fix that the grep method will consider 4 as spent when encountering 14
-	while rollRandomEpisode && $(echo $spentEpisodes | grep -q $epnumber); do echo "Rerolling $epnumber"; done
+	# Get an episode we haven't seen in this batch
+	obtainUnseenEpisode;
 
-	# Mark episode as spent now that we're going to start it
+	# Mark episode as spent now that we're going to see it
 	markEpisodeAsSpent $epnumber;
 
 }
