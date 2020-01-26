@@ -259,11 +259,21 @@ function playNext {
 	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
 	fi
 }
+# Select a random episode only from those not watched in the current batch
 function selectRankedRandomEpisode {
-	# At first, just make it pick at random
-	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
-	epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
 	# TODO: Create a file that contains seen episodes, so that a clever method of ranking can be made
+	function rollRandomEpisode {
+		epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
+	}
+	# Gather how many we have in total
+	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
+	# Episodes are not eligible for next  #TODO: Replace with input from file
+	spentEpisodeList=['1','2']
+
+	# As long as the episode rolled is matched on the list of spent ones, reroll
+	while rollRandomEpisode && $(echo $spentEpisodeList | grep -q $epnumber); do echo "Rerolling $epnumber"; done
+
+  # TODO: List should reset only when all episodes are in it
 }
 function playRankedRandom {
 	# Pick and play a rankedRandom episode
