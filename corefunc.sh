@@ -271,7 +271,8 @@ function selectRankedRandomEpisode {
 		spentEpisodes=()
 		# Create the file if not there
 		if [ ! -e 'rr-spent-episodes' ]; then
-			echo "" > rr-spent-episodes
+			touch rr-spent-episodes
+			echo "-=- Initializing spent episode list."
 		fi
 
 		# Blacklist every episode noted down in the file
@@ -281,8 +282,8 @@ function selectRankedRandomEpisode {
 
 		# If all the episodes are spent, start over
 		if [ ${#spentEpisodes[@]} -ge $totalEpisodesAvailable ]; then
-			echo "" > rr-spent-episodes
-			spentEpisodes=()
+			rm rr-spent-episodes
+			getSpentEpisodeList;
 		fi
 	}
 	function markEpisodeAsSpent {
