@@ -12,7 +12,7 @@
 scriptDir=$( dirname "${BASH_SOURCE[0]}" )
 configFile="$HOME/.config/series/config"
 # Sample movie files are excluded. Add new formats here.
-formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv'
+formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv\|m4v'
 # Default options used, simple playback with extras disabled
 playMode=true
 rewind=false
