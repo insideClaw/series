@@ -22,11 +22,11 @@ function presentSeries {
 	  dir[$entryCount]=$nextToAdd;
 	  entryCount=$(( $entryCount+1 ))
 	done
-	
+
 	count=0;
 	# the $entryCount variable is the amount of entries in $dir
 	echo "-=- Total: $entryCount series detected. Beginning parsing..."
-	while [ "$count" -lt "$entryCount" ] 
+	while [ "$count" -lt "$entryCount" ]
 	do
 		echo -n "$count "
 		saved=$( cat "$seriesDir/${dir[$count]}/saved" 2>/dev/null )
@@ -36,16 +36,16 @@ function presentSeries {
 			saved=1
 		# Verify value is a valid integer (comparable) and not a sneaky string (previously caused unintended behaviour and crash within the loop)
 		elif [ "$saved" -gt 0 ] 2>/dev/null
-		then 
+		then
 			:
-		else	
+		else
 			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid or present. File must contain only one integer larger than 0."
 			echo "-?- Would you like to set it to the first episode? Press enter to keep do so now, otherwise re-run script after fixing it yourself."
 			read "resetDecision"
 			if [ "$resetDecision" == "" ]
 			then
 				saved=1
-				echo "$saved" > "$seriesDir/${dir[$count]}/saved" 
+				echo "$saved" > "$seriesDir/${dir[$count]}/saved"
 				echo "-=- Saved file reset."
 			else
 				echo "-!- Reset of saved file not chosen, exiting as file is currently non-valid (needs integer >=1)."
@@ -53,7 +53,7 @@ function presentSeries {
 			fi
 		fi
 		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
-		# uses the variable formats, announced previously		
+		# uses the variable formats, announced previously
 		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
 		if $onlyReady
@@ -72,7 +72,7 @@ function presentSeries {
 }
 function checkNextEpisode {
 	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l)" ]
-	then 
+	then
 		nextEpisodeAvailable=true;
 	else
 		nextEpisodeAvailable=false;
@@ -83,8 +83,9 @@ function checkNextEpisode {
 
 function loadConfig {
 	# loads variables needed from the config file
-	if [ -f $configFile ] 
+	if [ -f $configFile ]
 	then
+		# TODO: Add if conditions for getting DirectoryWatched when "-x" is supplied; also add it above for creating the config file
 		seriesDir="$(grep 'Directory:' $configFile | cut -f2 -d ':')"
 		player="$(grep 'Player:' $configFile | cut -f2 -d ':')"
 	else
@@ -131,7 +132,7 @@ function showGuide {
 	savedVar=$(cat saved)
 	savedUp=$(($savedVar + 1 ))
 	cat /tmp/series/listpure | tail -n +$savedUp >> /tmp/series/list
-	
+
 	# do the actual printing from file, displayRange refines the outlook for large series
 	displayRange="$(( $(cat saved) + 20 ))"
 	cat /tmp/series/list | head -$displayRange
@@ -149,24 +150,24 @@ function chooseDirFromHome {
 		read choice;
 		# a bit of input sanitizing, $seriesAmount was initialized in presentSeries()
 		# the while loop checks if the choice is NOT a valid positive integer within permitted range
-		while [[ ! $choice =~ ^[0-9]+$ ]] || [ $choice -lt 1 ] || [ $choice -gt $seriesAmount ] 
+		while [[ ! $choice =~ ^[0-9]+$ ]] || [ $choice -lt 1 ] || [ $choice -gt $seriesAmount ]
 		do
 			echo "-!- Choice not an valid integer (1-$seriesAmount). Pick again:"
 			read choice
 		done
-		
+
 		choice=$(( $choice - humanBit)) # the choice entered was with human numericals in mind, revert it for computer use
 		echo "-=- ${dir[$choice]} decided!"
 		cd "$seriesDir/${dir[$choice]}"
 	# if the current seriesDir is a descendant of the series seriesDir, continue script, otherwise don't proceed as if it's a series seriesDir.
-	elif [ "$(pwd | grep $seriesDir -o)" == "" ] || [ "$(pwd)" == "$seriesDir" ] 
+	elif [ "$(pwd | grep $seriesDir -o)" == "" ] || [ "$(pwd)" == "$seriesDir" ]
 	then
 		echo "-!- Use from ~ (home) for main menu, use from a series in $seriesDir for direct play."
 		kill -SIGINT $$ # exit doesn't work, as the script is called with source
-	fi	
+	fi
 }
 # gets the seriesDir path from the file, configure ~/.config/series/config
-function configure {	
+function configure {
 	# As the main script is called with source, exit would destroy the running shell, kill -SIGINT $$ is used instead.
 	echo "-=- Configuration started."
 	# we have $configFile available from main script definition
@@ -179,7 +180,7 @@ function configure {
 	else
 		echo "-=- A series alias is already present in .bashrc, not adding anything"
 	fi
-	
+
 	# Create the config directory if it's not there, so creating the file works. Create even ~/.config if not there (check first).
 	configDir="$HOME/.config/series"
 	if [ ! -e "$HOME/.config" ]; then
@@ -198,7 +199,7 @@ function configure {
 	then
 		echo "-=- No changes to $seriesDir"
 	else
-		# eval is used to expand ~ ($HOME) 
+		# eval is used to expand ~ ($HOME)
 		eval seriesDir="$seriesDirNew"
 		echo "Directory:$seriesDir" > $configFile
 		echo "-=- Series directory changed to $seriesDir"
@@ -258,6 +259,78 @@ function playNext {
 	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
 	fi
 }
+# Select a random episode only from those not watched in the current batch
+function selectRankedRandomEpisode {
+	# Roll a random number out of the total
+	function rollRandomEpisode {
+		epnumber="$(( $RANDOM % $totalEpisodesAvailable +1 ))"
+	}
+	# Episodes that are not eligible for next playtime
+	function getSpentEpisodeList {
+		# Create/reset an empty indexed array
+		spentEpisodes=()
+		# Create the file if not there
+		if [ ! -e 'rr-spent-episodes' ]; then
+			touch rr-spent-episodes
+			echo "-=- Initializing empty spent episode list."
+		fi
+
+		# Blacklist every episode noted down in the file
+		for line in $(cat rr-spent-episodes); do
+			spentEpisodes+=($line)
+		done
+
+		# If all the episodes are spent, start over
+		if [ ${#spentEpisodes[@]} -ge $totalEpisodesAvailable ]; then
+			rm -f rr-spent-episodes
+			getSpentEpisodeList;
+		fi
+	}
+	function markEpisodeAsSpent {
+		epToInvalidate=$1
+		echo "$epToInvalidate" >> rr-spent-episodes
+	}
+
+ 	function checkIfEpisodeIsFresh {
+		# Assume episode is fresh then prove it's not by matching to the list
+		episodeIsFresh=true
+		suspectEpisode=$1
+		for s in ${spentEpisodes[@]}; do
+			if [ $suspectEpisode -eq $s ]; then
+				episodeIsFresh=False
+				break
+			fi
+		done
+
+	}
+	function obtainUnseenEpisode {
+		# As long as the episode rolled is matched on the list of spent ones, reroll again
+		episodeIsFresh=false
+		until [ "$episodeIsFresh" == true ]; do
+			rollRandomEpisode;
+			checkIfEpisodeIsFresh $epnumber;
+		done
+	}
+
+	# Gather how many we have in total
+	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
+
+	# Get info about which episodes are to be ignored
+	getSpentEpisodeList;
+
+	# Get an episode we haven't seen in this batch
+	obtainUnseenEpisode;
+
+	# Mark episode as spent now that we're going to see it
+	markEpisodeAsSpent $epnumber;
+
+}
+function playRankedRandom {
+	# Pick and play a rankedRandom episode
+	fillParams;
+	selectRankedRandomEpisode;
+	$player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
+}
 # after everything is completed, increment the next episode counter
 function incrementSaved {
 	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
@@ -291,7 +364,7 @@ function rewindEpisode {
 }
 # Verify that there are no missing episodes from a regular E09,E10,E11, etc. sequence
 function sequentialConsistencyCheck {
-	
+
 	regex='(?<=S..E)..'
 	episodeExpected=1
 	cat /tmp/series/listpure | while read line; do

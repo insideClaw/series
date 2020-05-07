@@ -14,7 +14,7 @@ configFile="$HOME/.config/series/config"
 # Sample movie files are excluded. Add new formats here.
 formats='mkv\|mpe?g\|avi\|ts\|mp4\|wmv\|m4v'
 # Default options used, simple playback with extras disabled
-playMode=true
+playMode="normal"
 rewind=false
 onlyReady=false
 reconfigure=false
@@ -34,7 +34,7 @@ source $scriptDir/corefunc.sh
 # Explicit OPTIND reset, as it's retained between runs because of sourcing the script
 OPTIND=1
 # Select mode and play, based on the mode given as argument; getops doesn't handle long parameters
-while getopts "hcbrselq" inputMode
+while getopts "hcbrselqx" inputMode
 do
 	case $inputMode in
 		-help | h)
@@ -71,10 +71,15 @@ do
 			echo "-=- Maximum volume for mplayer increased."
 			volmax=true;
 			;;
-			
-		-noseq | q)
+
+		-quietnoseq | q)
 			echo "-=- Skipping sequential consistency check."
 			seqcheck=false;
+			;;
+
+		-rankedrandom | x)
+		    echo "-=- Random ranking mode, playing a random episode not seen for a while!"
+			playMode="rankedRandom"
 			;;
 
 		\?)
@@ -109,19 +114,24 @@ if $seqcheck
 then
 	sequentialConsistencyCheck;
 fi
-	
-# having the details of the episode settled, play the desired file, then increment the next episode counter
-if $playMode
-then
-	playNext;
-	incrementSaved;
-fi
+
+case "$playMode" in
+	normal)
+		# having the details of the episode settled, play the desired file, then increment the next episode counter
+		playNext;
+		incrementSaved;
+		;;
+
+	rankedRandom)
+	    playRankedRandom;
+esac
 
 # If continuous mode is specified (endless=true), do the above with extra outputting. Continue until episodes run out or stopped
-if $playMode && $endless
+if [ "$playMode" == "normal" ] && $endless
 then
+	echo "BAU"
 	loopPlaying;
 fi
 
-# Prints a guide of available series and episodes at the end 
+# Prints a guide of available series and episodes at the end
 showGuide;
