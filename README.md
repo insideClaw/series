@@ -7,6 +7,7 @@ A bash script for automating selection and playing of series. Why have to rememb
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
 2. In a terminal, run:
 > cd <scriptDir>
+>
 > . series.sh
 
   * If running for the first time, you will be guided through setting some basic configuration.
