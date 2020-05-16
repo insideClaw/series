@@ -3,6 +3,11 @@ series
 
 A bash script for automating selection and playing of series. Why have to remember which episode of a series to watch next...
 
+## Windows-only prerequisite:
+1. Download and install CygWin from the official site https://www.cygwin.com/
+2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as C:/ProgramFiles/PotPlayer - new directory, no spaces.
+3. Launch a CygWin terminal
+
 ## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
 2. In a terminal, run:
@@ -14,8 +19,6 @@ A bash script for automating selection and playing of series. Why have to rememb
   * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
 
 3. Open a new terminal or type 'bash' (if that is your shell of choice) to renew the known aliases.
-
-Note: Confirmed to run on Windows, under an out-of-the-box Cygwin environment. Same instructions apply, only you provide the full path for a Windows player of your choice.
 
 ## Usage:
 
