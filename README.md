@@ -76,4 +76,4 @@ Arguments:
 * At present, you can only reset/alter the configuration of the program by editing  ~/.config/series/config; If you're on Windows using Cygwin, that's C:/cygwin64/home/YourUsername/.config/series/config  
 
 **Contact**:  
-For any questions, comments, or requests, contact me at mariost6@gmail.com
+For any questions, comments, or requests, contact me at mario.staykov@gmail.com
