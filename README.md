@@ -11,7 +11,7 @@ A bash script for automating selection and playing of series. Why have to rememb
 ## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
 2. In a terminal, run:
-> cd <scriptDir>
+> cd path/of/script/
 >
 > . series.sh
 
