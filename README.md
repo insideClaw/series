@@ -71,7 +71,9 @@ Arguments:
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * 'saved' file can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
-* You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.
+* It is advised to configure your player to auto-close on playback end
+* You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.  
+* At present, you can only reset/alter the configuration of the program by editing  ~/.config/series/config; If you're on Windows using Cygwin, that's C:/cygwin64/home/YourUsername/.config/series/config  
 
 **Contact**:  
 For any questions, comments, or requests, contact me at mariost6@gmail.com
