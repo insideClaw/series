@@ -13,7 +13,7 @@ A bash script for automating selection and playing of series. Why have to rememb
   * If running for the first time, you will be guided through setting some basic configuration.
   * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
 
-3. Open a new terminal or type 'bash' to renew the known aliases.
+3. Open a new terminal or type 'bash' (if that is your shell of choice) to renew the known aliases.
 
 Note: Confirmed to run on Windows, under an out-of-the-box Cygwin environment. Same instructions apply, only you provide the full path for a Windows player of your choice.
 
@@ -38,7 +38,7 @@ Depending on where it's ran from, the script runs in two modes:
 Arguments:  
 -h (help)
   Gives a brief of the way of usage.
-		
+
 -c (check)
   Only show guide for the chosen series, without playing.
 
