@@ -365,7 +365,7 @@ function rewindEpisode {
 # Verify that there are no missing episodes from a regular E09,E10,E11, etc. sequence
 function sequentialConsistencyCheck {
 
-	regex='(?<=S..E)..'
+	regex='(?<=[Ss]..[Ee])..'
 	episodeExpected=1
 	cat /tmp/series/listpure | while read line; do
 	#for line in $(cat /tmp/series/listpure); do
