@@ -174,7 +174,7 @@ function configure {
 	if [ "$(grep 'alias series=' ~/.bashrc)" == "" ]
 	then
 		#Fix needed to add ./series to alias and not ./corefunc. Should be fine unless someone goes around changing the name of corefunc.sh!
-		mainScriptName=$(readlink -m "${BASH_SOURCE[0]}" | sed s/corefunc/series/)
+		mainScriptName="$(pwd)/series.sh"
 		echo "alias series='source $mainScriptName'" >> ~/.bashrc
     	echo "-=- Alias appended to $HOME/.bashrc"
 	else
