@@ -39,7 +39,7 @@ function presentSeries {
 		then
 			:
 		else
-			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid or present. File must contain only one integer larger than 0."
+			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid. File must contain only one integer larger than 0."
 			echo "-?- Would you like to set it to the first episode? Press enter to keep do so now, otherwise re-run script after fixing it yourself."
 			read "resetDecision"
 			if [ "$resetDecision" == "" ]
