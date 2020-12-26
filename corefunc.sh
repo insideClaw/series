@@ -195,30 +195,28 @@ function configure {
 		echo "-=- $configDir created."
 	fi
 
-	#Setting configuration for seriesDir
+	# Remove existing configuration file, after we have already gathered its settings
+	rm -f "$configFile"
+
+	# Setting configuration for seriesDir
 	echo "-?- Please specify the pathname of the series directory. Example: ~/videos/series. Press enter to keep current. [$seriesDir]"
 	read seriesDirNew
-	if [ "$seriesDirNew" == "" ]
-	then
-		echo "-=- No changes to $seriesDir"
-	else
-		# eval is used to expand ~ ($HOME)
-		eval seriesDir="$seriesDirNew"
-		echo "Directory:$seriesDir" > $configFile
-		echo "-=- Series directory changed to $seriesDir"
+	if [ "$seriesDirNew" != "" ]; then
+		eval seriesDir="$seriesDirNew" # eval is used to expand ~ ($HOME)
 	fi
+
+	echo "Directory:$seriesDir" > $configFile
+	echo "-=- Series directory set to $seriesDir"
 
 	#Setting configuration for mplayer
 	echo "-?- Please specify the name of the player to be used. Example: mplayer. Press enter to keep current. [$player]"
 	read playerNew
-	if [ "$playerNew" == "" ]
-	then
-		echo "-=- No changes to $player"
-	else
+	if [ "$playerNew" != "" ]; then
 		eval player="$playerNew"
-		echo "Player:$player" >> $configFile
-		echo "-=- Player used changed to $player"
 	fi
+	
+	echo "Player:$player" >> $configFile
+	echo "-=- Player used set to $player"
 }
 function populateList {
 	find . -iregex ".*.$formats" | grep -vi sample | sort > /tmp/series/listpure
