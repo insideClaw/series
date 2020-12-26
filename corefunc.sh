@@ -364,12 +364,10 @@ function rewindEpisode {
 }
 # Verify that there are no missing episodes from a regular E09,E10,E11, etc. sequence
 function sequentialConsistencyCheck {
-
 	regex='(?<=[Ss]\d\d[Ee])\d\d'
 	episodeExpected=1
 	cat /tmp/series/listpure | while read line; do
-	#for line in $(cat /tmp/series/listpure); do
-		episodeCurrent="$(echo "$line" | grep -oP $regex)"
+		episodeCurrent="$(echo "$line" | perl -nle '/('$regex')/ && print $1')"
 		# Sanity check that episodes can be found, by checking if value is integer
 		if ! [[ "$episodeCurrent" =~ ^[0-9]+$ ]]
 		then
