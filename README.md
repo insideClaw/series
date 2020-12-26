@@ -3,10 +3,13 @@ series
 
 A bash script for automating selection and playing of series. Why have to remember which episode of a series to watch next...
 
-## Windows-only prerequisite:
+## Windows prerequisite:
 1. Download and install CygWin from the official site https://www.cygwin.com/
-2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as C:/ProgramFiles/PotPlayer - new directory, no spaces.
+2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as `C:/ProgramFiles/PotPlayer` - new directory, no spaces.
 3. Launch a CygWin terminal
+
+## Linux & Mac:
+Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
 
 ## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
@@ -16,7 +19,7 @@ A bash script for automating selection and playing of series. Why have to rememb
 > . series.sh
 
   * If running for the first time, you will be guided through setting some basic configuration.
-  * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
+  * Note that it will add `"alias series='source <scriptDir>/series.sh'`" to your `.bashrc`, unless it already exists as an entry.
 
 3. Open a new terminal or type 'bash' (if that is your shell of choice) to renew the known aliases.
 
@@ -52,13 +55,13 @@ Arguments:
   Sets the next episode of the chosen series to one less.
 
 -s (set)  
-  Guides through setting up the config file.
+  Guides through setting up the config file, useful for resetting.
 
 -e (endless)
   Endless mode, continuous playback of episodes - until episodes run out or script stopped with CTRL-C.
 
 -l (volume)
-  mplayer-only switch, passes the parameters "--softvol-max 600 -softvol" in order to allow volume of sounds past the usual 100%.
+  mplayer-only switch, passes the parameters `"--softvol-max 600 -softvol"` in order to allow volume of sounds past the usual 100%.
 
 -q (noseq)
   Disables the sequential consistency check, in order to play series that don't conform to the regular naming convention (yet)
