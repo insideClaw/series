@@ -15,7 +15,7 @@ function presentSeries {
 	ls $seriesDir > /tmp/series/seriesDirContents
 
 	# Use the folder contents that are were fetched earlier
-	seriesAmount="$(cat /tmp/series/seriesDirContents | wc -l)"
+	seriesAmount="$(cat /tmp/series/seriesDirContents | wc -l | awk {'print $1'})"
 	while [ "$entryCount" -lt "$seriesAmount" ]
 	do
 	  nextToAdd="$(cat /tmp/series/seriesDirContents | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
@@ -71,7 +71,7 @@ function presentSeries {
 	cat /tmp/series/presentableSeries
 }
 function checkNextEpisode {
-	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l)" ]
+	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l | awk {'print $1'})" ]
 	then
 		nextEpisodeAvailable=true;
 	else
@@ -120,7 +120,7 @@ function showGuide {
 
 	# prints the structure surrounding and the name of the next episode
 	echo "" >> /tmp/series/list # literally makes a new line, better outlook
-	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l | awk {'print $1'}) ]
 	then
 	  echo "> $(cat /tmp/series/listpure | head -$(cat saved) | tail -1)" >> /tmp/series/list
 	else
@@ -313,7 +313,7 @@ function selectRankedRandomEpisode {
 	}
 
 	# Gather how many we have in total
-	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
+	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l | awk {'print $1'})"
 
 	# Get info about which episodes are to be ignored
 	getSpentEpisodeList;
@@ -333,7 +333,7 @@ function playRankedRandom {
 }
 # after everything is completed, increment the next episode counter
 function incrementSaved {
-	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l | awk {'print $1'}) ]
 	then
 	  echo $(( $epnumber + 1 )) > saved
 	fi
