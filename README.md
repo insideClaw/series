@@ -76,7 +76,6 @@ Arguments:
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
 * It is advised to configure your player to auto-close on playback end
 * You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.  
-* At present, you can only reset/alter the configuration of the program by editing  ~/.config/series/config; If you're on Windows using Cygwin, that's C:/cygwin64/home/YourUsername/.config/series/config  
 
 **Contact**:  
 For any questions, comments, or requests, contact me at mario.staykov@gmail.com
