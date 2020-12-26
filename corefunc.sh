@@ -115,8 +115,11 @@ function openCleanTemp {
 # it prepares a "/tmp/series/list" file in advance, then prints its contents
 function showGuide {
 	# prints everything up to the next episode
-	lastDone=$(( $(cat saved) - 1 )) # gets the next episode to watch from saved, then subtracts one for last ep watched
-	cat /tmp/series/listpure | head -$lastDone > /tmp/series/list
+	if [ $(cat saved) -gt 1 ] # Only calculate previous watched episode if something has been watched
+	then
+		lastDone=$(( $(cat saved) - 1 ))
+		cat /tmp/series/listpure | head -$lastDone > /tmp/series/list
+	fi
 
 	# prints the structure surrounding and the name of the next episode
 	echo "" >> /tmp/series/list # literally makes a new line, better outlook
