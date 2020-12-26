@@ -9,8 +9,9 @@ A bash script for automating selection and playing of series. Why have to rememb
 3. Launch a CygWin terminal
 
 ## Linux & Mac:
-Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
-Not designed to be used with zsh or any other shell other than Bash.
+* Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
+* It is advised to configure your player to auto-close on playback end and other options you may want
+* Not designed to be used with zsh or any other shell other than Bash.
 
 ## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
@@ -75,7 +76,6 @@ Arguments:
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * 'saved' file can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
-* It is advised to configure your player to auto-close on playback end
 * You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.  
 
 **Contact**:  
