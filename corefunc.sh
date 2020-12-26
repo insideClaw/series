@@ -55,7 +55,6 @@ function presentSeries {
 		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
 		# uses the variable formats, announced previously
 		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*.$formats" | grep -vi sample | wc -l)
-		echo $total
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
 		if $onlyReady
 		then
