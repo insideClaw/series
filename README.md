@@ -10,6 +10,7 @@ A bash script for automating selection and playing of series. Why have to rememb
 
 ## Linux & Mac:
 Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
+Not designed to be used with zsh or any other shell other than Bash.
 
 ## Install:
 1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
