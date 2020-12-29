@@ -64,7 +64,7 @@ function presentSeries {
 				continue;
 			fi
 		fi
-		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
+		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$((total - 1))]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
 	echo -e "\n";
@@ -214,7 +214,7 @@ function configure {
 	if [ "$playerNew" != "" ]; then
 		eval player="$playerNew"
 	fi
-	
+
 	echo "Player:$player" >> $configFile
 	echo "-=- Player used set to $player"
 }
