@@ -202,7 +202,7 @@ function configure {
 	echo "-?- Please specify the pathname of the series directory. Example: ~/videos/series. Press enter to keep current. [$seriesDir]"
 	read "seriesDirNew"
 	if [ "$seriesDirNew" != "" ]; then
-		eval seriesDir="$seriesDirNew" # eval is used to expand ~ ($HOME)
+		seriesDir="${seriesDirNew/#\~/$HOME}"
 	fi
 
 	echo "Directory:$seriesDir" > $configFile
@@ -212,9 +212,8 @@ function configure {
 	echo "-?- Please specify the name of the player to be used. Example: mplayer. Press enter to keep current. [$player]"
 	read "playerNew"
 	if [ "$playerNew" != "" ]; then
-		eval player="$playerNew"
+		player="${playerNew/#\~/$HOME}"
 	fi
-
 	echo "Player:$player" >> $configFile
 	echo "-=- Player used set to $player"
 }
