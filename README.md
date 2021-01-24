@@ -3,9 +3,9 @@ series
 
 A bash script for automating selection and playing of series. Why have to remember which episode of a series to watch next...
 
-## Windows prerequisite:
-1. Download and install CygWin from the official site https://www.cygwin.com/
-2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as `C:/ProgramFiles/PotPlayer` - new directory, no spaces.
+## Windows-only prerequisite:
+1. Download and install CygWin from the official site https://www.cygwin.com/ enabling package `git` during the install.
+2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as C:/ProgramFiles/PotPlayer - new directory, no spaces.
 3. Launch a CygWin terminal
 
 ## Linux & Mac:
@@ -14,14 +14,16 @@ A bash script for automating selection and playing of series. Why have to rememb
 * Not designed to be used with zsh or any other shell other than Bash.
 
 ## Install:
-1. Download and extract to a suitable place for the script. Example: ~/scripts/series/
-2. In a terminal, run:
-> cd path/of/script/
+1. Use `cd` in Terminal to navigate to a suitable directory you want to place the script in
+2. Execute `git clone https://github.com/insideClaw/series.git`
+2. Then run for the first time and follow the on-screen instructions:
+> cd series
 >
 > . series.sh
 
   * If running for the first time, you will be guided through setting some basic configuration.
-  * Note that it will add `"alias series='source <scriptDir>/series.sh'`" to your `.bashrc`, unless it already exists as an entry.
+  * You might want to open another terminal window to establish where your paths are, such as `/cygdrive/d/series` and `/cygdrive/c/Program\ Files/VideoLAN/VLC/vlc.exe`
+  * Note that it will add "alias series='source <scriptDir>/series.sh'" to your .bashrc, unless it already exists as an entry.
 
 3. Open a new terminal or type 'bash' (if that is your shell of choice) to renew the known aliases.
 
