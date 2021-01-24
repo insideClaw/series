@@ -4,14 +4,14 @@ series
 A bash script for automating selection and playing of series. Why have to remember which episode of a series to watch next...
 
 ## Windows-only prerequisite:
-1. Download and install CygWin from the official site https://www.cygwin.com/ enabling package `git` during the install.
-2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as C:/ProgramFiles/PotPlayer - new directory, no spaces.
+1. Download and install CygWin from the official site https://www.cygwin.com/ enabling package `git` during the install
+2. Ensure you have a working video player. Could be beneficial to use not your main player, so you can configure some useful options like auto-close on playback finish
 3. Launch a CygWin terminal
 
 ## Linux & Mac:
-* Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
+* Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac
 * It is advised to configure your player to auto-close on playback end and other options you may want
-* Not designed to be used with zsh or any other shell other than Bash.
+* Not designed to be used with zsh or any other shell other than Bash
 
 ## Install:
 1. Use `cd` in Terminal to navigate to a suitable directory you want to place the script in
