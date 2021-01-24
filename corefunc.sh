@@ -200,7 +200,7 @@ function configure {
 
 	# Setting configuration for seriesDir
 	echo "-?- Please specify the pathname of the series directory. Example: ~/videos/series. Press enter to keep current. [$seriesDir]"
-	read seriesDirNew
+	read "seriesDirNew"
 	if [ "$seriesDirNew" != "" ]; then
 		eval seriesDir="$seriesDirNew" # eval is used to expand ~ ($HOME)
 	fi
@@ -210,7 +210,7 @@ function configure {
 
 	#Setting configuration for mplayer
 	echo "-?- Please specify the name of the player to be used. Example: mplayer. Press enter to keep current. [$player]"
-	read playerNew
+	read "playerNew"
 	if [ "$playerNew" != "" ]; then
 		eval player="$playerNew"
 	fi
