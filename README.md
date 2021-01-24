@@ -8,6 +8,11 @@ A bash script for automating selection and playing of series. Why have to rememb
 2. Install a player (I prefer PotPlayer for this) in a location without spaces (support for that is to be added, some day), such as C:/ProgramFiles/PotPlayer - new directory, no spaces.
 3. Launch a CygWin terminal
 
+## Linux & Mac:
+* Just ensure you have your media player path handy, such as `mplayer` for Linux or `/Applications/VLC.app/Contents/MacOS/VLC` for Mac.
+* It is advised to configure your player to auto-close on playback end and other options you may want
+* Not designed to be used with zsh or any other shell other than Bash.
+
 ## Install:
 1. Use `cd` in Terminal to navigate to a suitable directory you want to place the script in
 2. Execute `git clone https://github.com/insideClaw/series.git`
@@ -54,13 +59,13 @@ Arguments:
   Sets the next episode of the chosen series to one less.
 
 -s (set)  
-  Guides through setting up the config file.
+  Guides through setting up the config file, useful for resetting.
 
 -e (endless)
   Endless mode, continuous playback of episodes - until episodes run out or script stopped with CTRL-C.
 
 -l (volume)
-  mplayer-only switch, passes the parameters "--softvol-max 600 -softvol" in order to allow volume of sounds past the usual 100%.
+  mplayer-only switch, passes the parameters `"--softvol-max 600 -softvol"` in order to allow volume of sounds past the usual 100%.
 
 -q (noseq)
   Disables the sequential consistency check, in order to play series that don't conform to the regular naming convention (yet)
@@ -73,9 +78,7 @@ Arguments:
 * Uses a 'saved' file in the series directory for keeping track of the next episode to play, it's created upon initialization of new series.  
 * 'saved' file can be edited manually for episode navigation (potential feature for adding to the script, if requested!)  
 * If it's invoked with 'bash' instead of 'source' the script will be limited in functionality, as it cannot change the shell's working directory.  
-* It is advised to configure your player to auto-close on playback end
 * You can combine arguments, i.e series -rb will show only series with unwatched episodes, then play the last watched one. Add -c to that and it will only revert to it, without playing.  
-* At present, you can only reset/alter the configuration of the program by editing  ~/.config/series/config; If you're on Windows using Cygwin, that's C:/cygwin64/home/YourUsername/.config/series/config  
 
 **Contact**:  
 For any questions, comments, or requests, contact me at mario.staykov@gmail.com

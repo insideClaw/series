@@ -15,7 +15,7 @@ function presentSeries {
 	ls $seriesDir > /tmp/series/seriesDirContents
 
 	# Use the folder contents that are were fetched earlier
-	seriesAmount="$(cat /tmp/series/seriesDirContents | wc -l)"
+	seriesAmount="$(cat /tmp/series/seriesDirContents | wc -l | awk {'print $1'})"
 	while [ "$entryCount" -lt "$seriesAmount" ]
 	do
 	  nextToAdd="$(cat /tmp/series/seriesDirContents | head -$(($entryCount+1)) | tail -1)"; # need to increase by one for getting 0 last files is not worth for first case
@@ -39,7 +39,7 @@ function presentSeries {
 		then
 			:
 		else
-			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid or present. File must contain only one integer larger than 0."
+			echo -e "\n-!- Saved file for series ${dir[$count]} is not valid. File must contain only one integer larger than 0."
 			echo "-?- Would you like to set it to the first episode? Press enter to keep do so now, otherwise re-run script after fixing it yourself."
 			read "resetDecision"
 			if [ "$resetDecision" == "" ]
@@ -54,7 +54,7 @@ function presentSeries {
 		fi
 		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
 		# uses the variable formats, announced previously
-		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*\.\($formats\)" | grep -vi sample | wc -l)
+		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*.$formats" | grep -vi sample | wc -l | awk {'print $1'})
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
 		if $onlyReady
 		then
@@ -64,14 +64,14 @@ function presentSeries {
 				continue;
 			fi
 		fi
-		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
+		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$((total - 1))]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
 	echo -e "\n";
 	cat /tmp/series/presentableSeries
 }
 function checkNextEpisode {
-	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l)" ]
+	if	[ "$(cat saved)" -le "$(cat /tmp/series/listpure | wc -l | awk {'print $1'})" ]
 	then
 		nextEpisodeAvailable=true;
 	else
@@ -115,12 +115,15 @@ function openCleanTemp {
 # it prepares a "/tmp/series/list" file in advance, then prints its contents
 function showGuide {
 	# prints everything up to the next episode
-	lastDone=$(( $(cat saved) - 1 )) # gets the next episode to watch from saved, then subtracts one for last ep watched
-	cat /tmp/series/listpure | head -$lastDone > /tmp/series/list
+	if [ $(cat saved) -gt 1 ] # Only calculate previous watched episode if something has been watched
+	then
+		lastDone=$(( $(cat saved) - 1 ))
+		cat /tmp/series/listpure | head -$lastDone > /tmp/series/list
+	fi
 
 	# prints the structure surrounding and the name of the next episode
 	echo "" >> /tmp/series/list # literally makes a new line, better outlook
-	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l | awk {'print $1'}) ]
 	then
 	  echo "> $(cat /tmp/series/listpure | head -$(cat saved) | tail -1)" >> /tmp/series/list
 	else
@@ -174,7 +177,7 @@ function configure {
 	if [ "$(grep 'alias series=' ~/.bashrc)" == "" ]
 	then
 		#Fix needed to add ./series to alias and not ./corefunc. Should be fine unless someone goes around changing the name of corefunc.sh!
-		mainScriptName=$(readlink -m "${BASH_SOURCE[0]}" | sed s/corefunc/series/)
+		mainScriptName="$(pwd)/series.sh"
 		echo "alias series='source $mainScriptName'" >> ~/.bashrc
     	echo "-=- Alias appended to $HOME/.bashrc"
 	else
@@ -192,33 +195,30 @@ function configure {
 		echo "-=- $configDir created."
 	fi
 
-	#Setting configuration for seriesDir
+	# Remove existing configuration file, after we have already gathered its settings
+	rm -f "$configFile"
+
+	# Setting configuration for seriesDir
 	echo "-?- Please specify the pathname of the series directory. Example: ~/videos/series. Press enter to keep current. [$seriesDir]"
-	read seriesDirNew
-	if [ "$seriesDirNew" == "" ]
-	then
-		echo "-=- No changes to $seriesDir"
-	else
-		# eval is used to expand ~ ($HOME)
-		eval seriesDir="$seriesDirNew"
-		echo "Directory:$seriesDir" > $configFile
-		echo "-=- Series directory changed to $seriesDir"
+	read "seriesDirNew"
+	if [ "$seriesDirNew" != "" ]; then
+		seriesDir="${seriesDirNew/#\~/$HOME}"
 	fi
+
+	echo "Directory:$seriesDir" > $configFile
+	echo "-=- Series directory set to $seriesDir"
 
 	#Setting configuration for mplayer
 	echo "-?- Please specify the name of the player to be used. Example: mplayer. Press enter to keep current. [$player]"
-	read playerNew
-	if [ "$playerNew" == "" ]
-	then
-		echo "-=- No changes to $player"
-	else
-		eval player="$playerNew"
-		echo "Player:$player" >> $configFile
-		echo "-=- Player used changed to $player"
+	read "playerNew"
+	if [ "$playerNew" != "" ]; then
+		player="${playerNew/#\~/$HOME}"
 	fi
+	echo "Player:$player" >> $configFile
+	echo "-=- Player used set to $player"
 }
 function populateList {
-	find . -iregex ".*\.\($formats\)" | grep -vi sample | sort > /tmp/series/listpure
+	find . -iregex ".*.$formats" | grep -vi sample | sort > /tmp/series/listpure
 	# ensure the saved file exists, if not, create one
 	if [ ! -f saved ]
 	then
@@ -313,7 +313,7 @@ function selectRankedRandomEpisode {
 	}
 
 	# Gather how many we have in total
-	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l)"
+	totalEpisodesAvailable="$(cat /tmp/series/listpure | wc -l | awk {'print $1'})"
 
 	# Get info about which episodes are to be ignored
 	getSpentEpisodeList;
@@ -333,7 +333,7 @@ function playRankedRandom {
 }
 # after everything is completed, increment the next episode counter
 function incrementSaved {
-	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l) ]
+	if [ $(cat saved) -le $(cat /tmp/series/listpure | wc -l | awk {'print $1'}) ]
 	then
 	  echo $(( $epnumber + 1 )) > saved
 	fi
@@ -364,12 +364,10 @@ function rewindEpisode {
 }
 # Verify that there are no missing episodes from a regular E09,E10,E11, etc. sequence
 function sequentialConsistencyCheck {
-
 	regex='(?<=[Ss]\d\d[Ee])\d\d'
 	episodeExpected=1
 	cat /tmp/series/listpure | while read line; do
-	#for line in $(cat /tmp/series/listpure); do
-		episodeCurrent="$(echo "$line" | grep -oP $regex)"
+		episodeCurrent="$(echo "$line" | perl -nle '/('$regex')/ && print $1')"
 		# Sanity check that episodes can be found, by checking if value is integer
 		if ! [[ "$episodeCurrent" =~ ^[0-9]+$ ]]
 		then
