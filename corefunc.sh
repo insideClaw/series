@@ -256,7 +256,7 @@ function playNext {
 	if $nextEpisodeAvailable # if there is at least one more episode
 	then
 	  # input is taken from /dev/null to make sure a nasty 'q' keystroke doesn't get queue up in between episodes
-	  $player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
+	  "$player" "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
 	fi
 }
 # Select a random episode only from those not watched in the current batch
@@ -329,7 +329,7 @@ function playRankedRandom {
 	# Pick and play a rankedRandom episode
 	fillParams;
 	selectRankedRandomEpisode;
-	$player "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
+	"$player" "$(cat /tmp/series/listpure | head -$epnumber | tail -1)" $params < /dev/null
 }
 # after everything is completed, increment the next episode counter
 function incrementSaved {
