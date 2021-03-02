@@ -54,7 +54,7 @@ function presentSeries {
 		fi
 		saved=$(( $saved - 1 )) # make it be the number of episodes watched, instead of next
 		# uses the variable formats, announced previously
-		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*.$formats" | grep -vi sample | wc -l | awk {'print $1'})
+		total=$(find "$seriesDir/${dir[$count]}" -iregex ".*.$formats" -type f | grep -vi sample | wc -l | awk {'print $1'})
 		# if the user specified they want only the ready series, print only if there are available episodes, otherwise skip the current item's iteration
 		if $onlyReady
 		then
@@ -64,7 +64,7 @@ function presentSeries {
 				continue;
 			fi
 		fi
-		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$((total - 1))]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
+		echo "$(($count + $humanBit)). ${dir[$count]} [$saved/$total]" >> /tmp/series/presentableSeries # present the uncomfortable to press 0 into a 1
 		count=$(( $count + 1 ));
 	done
 	echo -e "\n";
@@ -218,7 +218,7 @@ function configure {
 	echo "-=- Player used set to $player"
 }
 function populateList {
-	find . -iregex ".*.$formats" | grep -vi sample | sort > /tmp/series/listpure
+	find . -iregex ".*.$formats" -type f | grep -vi sample | sort > /tmp/series/listpure
 	# ensure the saved file exists, if not, create one
 	if [ ! -f saved ]
 	then
